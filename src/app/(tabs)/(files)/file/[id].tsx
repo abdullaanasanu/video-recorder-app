@@ -1,65 +1,30 @@
 import { useThemeColor } from "@/src/hooks/useThemeColor";
-import { useLocalSearchParams } from "expo-router";
-import { View, Text, StyleSheet, Pressable, ScrollView } from "react-native";
-import { Image } from "expo-image";
+import { Link, useLocalSearchParams } from "expo-router";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Pressable,
+  ScrollView,
+  Button,
+} from "react-native";
 import { useState } from "react";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
-import * as ImagePicker from "expo-image-picker";
+import { Media } from "./_media";
+import { AudioPlayer } from "./_audio";
 
-export default function DetailsScreen() {
+export default function EditorScreen() {
   const { id } = useLocalSearchParams();
 
   const sceneDefault: any = {
     id: 1,
+    audio: null,
     thumb: "https://images.pexels.com/photos/8566449/pexels-photo-8566449.jpeg",
   };
 
   const [scenes, setScenes] = useState([sceneDefault]);
 
   const styles = getStyles(useThemeColor);
-  const [image, setImage] = useState(null);
-
-  const pickImage = async (scene: any) => {
-    try {
-      // No permissions request is necessary for launching the image library
-      // let result: any = await ImagePicker.launchImageLibraryAsync({
-      //   mediaTypes: ImagePicker.MediaTypeOptions.All,
-      //   allowsEditing: true,
-      //   aspect: [4, 3],
-      //   quality: 1,
-      // });
-      // launch camera
-      let result: any = await ImagePicker.launchCameraAsync({
-        // mediaTypes: ImagePicker.MediaTypeOptions.All,
-        mediaTypes: ImagePicker.MediaTypeOptions.Videos,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-      });
-
-      console.log(result);
-
-      if (!result.canceled) {
-        setImage(result.assets[0].uri);
-      }
-
-      if (result?.assets?.length > 0) {
-        // update scene thumb
-        const updatedScenes = scenes.map((s) => {
-          if (s.id === scene.id) {
-            return {
-              ...s,
-              thumb: result.assets[0].uri,
-            };
-          }
-          return s;
-        });
-        setScenes(updatedScenes);
-      }
-    } catch (error) {
-      console.log("error", error);
-    }
-  };
 
   // scene add
   const addScene = () => {
@@ -67,12 +32,11 @@ export default function DetailsScreen() {
       ...scenes,
       {
         id: scenes.length + 1,
+        audio: null,
         thumb: null,
       },
     ]);
   };
-
-  console.log("scene", scenes);
 
   return (
     <ScrollView style={styles.scroller}>
@@ -81,14 +45,8 @@ export default function DetailsScreen() {
           <View style={styles.scene} key={scene.id}>
             <Text style={styles.sceneHead}>Scene {index + 1} </Text>
 
-            <Pressable onPress={() => pickImage(scene)}>
-              {scene.thumb ? (
-                <Image source={scene.thumb} style={styles.sceneThumb} />
-              ) : (
-                <View style={styles.imageBox} />
-              )}
-            </Pressable>
-            {/* <Image source={scene.thumb} style={styles.sceneThumb} /> */}
+            <Media scene={scene} scenes={scenes} setScenes={setScenes} />
+            <AudioPlayer scene={scene} scenes={scenes} setScenes={setScenes} />
           </View>
         ))}
         <Pressable style={styles.sceneAdd} onPress={addScene}>
@@ -99,14 +57,26 @@ export default function DetailsScreen() {
           />
         </Pressable>
       </View>
+      <Link href="../player">
+        <View style={styles.bottom}>
+          <Text style={styles.sceneHead}>View Video</Text>
+        </View>
+      </Link>
     </ScrollView>
   );
 }
 
 function getStyles(theme: any) {
   return StyleSheet.create({
+    bottom: {
+      // position: "absolute",
+      bottom: 0,
+      width: "100%",
+      padding: 15,
+    },
     scroller: {
       backgroundColor: theme({}, "backgroundLight"),
+      minHeight: "100%",
     },
     container: {
       backgroundColor: theme({}, "backgroundLight"),
@@ -137,6 +107,8 @@ function getStyles(theme: any) {
       height: 100,
       backgroundColor: theme({}, "backgroundLight"),
       borderRadius: 5,
+      justifyContent: "center",
+      alignItems: "center",
     },
     sceneAdd: {
       backgroundColor: theme({}, "background"),

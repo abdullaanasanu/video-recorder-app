@@ -20,8 +20,8 @@ export const Colors: any = {
   dark: {
     primary: "#fd3074",
     text: "#FBFDFC",
-    background: "#202020",
-    backgroundLight: "#2D2D2D",
+    background: "#111111",
+    backgroundLight: "#222222",
     tint: tintColorDark,
     icon: "#9BA1A6",
     tabIconDefault: "#9BA1A6",

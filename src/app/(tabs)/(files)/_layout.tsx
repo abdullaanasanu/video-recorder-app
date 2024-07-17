@@ -26,6 +26,18 @@ export default function FileLayout() {
           title: "Editor",
         }}
       />
+      <Stack.Screen
+        name="camera"
+        options={{
+          title: "Camera",
+        }}
+      />
+      <Stack.Screen
+        name="player"
+        options={{
+          title: "Player",
+        }}
+      />
     </Stack>
   );
 }
